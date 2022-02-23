@@ -11,6 +11,7 @@ on:
       - '*'
     branches:
       - main
+      - fix-beta-releases
 
 jobs:
   publish:
@@ -31,19 +32,10 @@ jobs:
           git config user.name "Li.Finance"
           git config user.email "<>"
       - name: Create release
-        run: yarn release --prerelease beta
+        run: yarn release --skip.changelog --prerelease beta
       - name: Publish to npm
         run: npm publish --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Setup .npmrc file to publish to GitHub Packages
-        uses: actions/setup-node@v1
-        with:
-          node-version: '14.x'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@lifinance'
-      - run: npm run addscope
-      - name: Publish to GitHub Packages
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Save changes
+        run: git push --follow-tags
